@@ -3,7 +3,7 @@
 $host = 'localhost';
 $db   = 'pbp2026'; // Nama database yang ada di file cli_create_user.php
 $user = 'root';
-$pass = 'password_baru'; // Sesuaikan jika password MySQL kamu kosong "" atau "root"
+$pass = ''; // Sesuaikan jika password MySQL kamu kosong "" atau "root"
 
 $dsn  = "mysql:host=$host;dbname=$db;charset=utf8mb4";
 
