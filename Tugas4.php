@@ -1,43 +1,52 @@
 <?php
-
 include 'db_config.php';
+?>
 
-echo "=== OPERASI UPDATE DATA VIA CLI ===\n";
+<h2>=== OPERASI UPDATE DATA USER ===</h2>
 
-// 1. Ambil ID sebagai acuan data mana yang mau diupdate
-echo "Masukkan ID User yang ingin diupdate: ";
-$id = trim(fgets(STDIN));
+<form method="POST">
+    ID User: <br>
+    <input type="text" name="id" required><br><br>
 
-// 2. Cek apakah ID tersebut ada di database
-$sql_cek = "SELECT * FROM user WHERE id = '$id'";
-$result = $conn->query($sql_cek);
+    Nama Baru: <br>
+    <input type="text" name="username"><br><br>
 
-if ($result->num_rows > 0) {
-    $data = $result->fetch_assoc();
-    echo "\nData Ditemukan!\n";
-    echo "Nama saat ini: " . $data['username'] . "\n";
-    echo "Email saat ini: " . $data['email'] . "\n";
-    echo "-----------------------------------\n";
+    Email Baru: <br>
+    <input type="email" name="email"><br><br>
 
-    // 3. Input data baru
-    echo "Masukkan Nama Baru (kosongkan jika tidak ingin diubah): ";
-    $nama_baru = trim(fgets(STDIN));
-    $nama_final = ($nama_baru == "") ? $data['username'] : $nama_baru;
+    <button type="submit" name="update">Update</button>
+</form>
 
-    echo "Masukkan Email Baru (kosongkan jika tidak ingin diubah): ";
-    $email_baru = trim(fgets(STDIN));
-    $email_final = ($email_baru == "") ? $data['email'] : $email_baru;
+<hr>
 
-    // 4. Eksekusi perintah UPDATE ke database
-    $sql_update = "UPDATE user SET username = '$nama_final', email = '$email_final' WHERE id = '$id'";
+<?php
+if (isset($_POST['update'])) {
+    $id = $_POST['id'];
+    $nama_baru = $_POST['username'];
+    $email_baru = $_POST['email'];
 
-    if ($conn->query($sql_update) === TRUE) {
-        echo "\nSukses: Data berhasil diperbarui!\n";
+    // cek data berdasarkan ID
+    $sql_cek = "SELECT * FROM user WHERE id = '$id'";
+    $result = $conn->query($sql_cek);
+
+    if ($result->num_rows > 0) {
+        $data = $result->fetch_assoc();
+
+        // kalau kosong, pakai data lama
+        $nama_final = ($nama_baru == "") ? $data['username'] : $nama_baru;
+        $email_final = ($email_baru == "") ? $data['email'] : $email_baru;
+
+        $sql_update = "UPDATE user SET username='$nama_final', email='$email_final' WHERE id='$id'";
+
+        if ($conn->query($sql_update) === TRUE) {
+            echo "<p style='color:green;'>Sukses: Data berhasil diperbarui!</p>";
+        } else {
+            echo "<p style='color:red;'>Error: " . $conn->error . "</p>";
+        }
+
     } else {
-        echo "\nError: " . $conn->error . "\n";
+        echo "<p style='color:red;'>Error: ID tidak ditemukan!</p>";
     }
-} else {
-    echo "\nError: Data dengan ID tersebut tidak ditemukan.\n";
 }
 
 $conn->close();
