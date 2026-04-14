@@ -1,23 +1,28 @@
-<?php
-// Pengaturan Database sesuai file cli kamu
+﻿<?php
 $host = 'localhost';
-$db   = 'pbp2026'; // Nama database yang ada di file cli_create_user.php
 $user = 'root';
-$pass = ''; // Sesuaikan jika password MySQL kamu kosong "" atau "root"
+$pass = ''; // Coba kosongkan dulu, kalau gagal ganti jadi 'root'
+$db   = 'db_latihan'; // Sesuaikan dengan nama database di phpMyAdmin kamu
 
-$dsn  = "mysql:host=$host;dbname=$db;charset=utf8mb4";
-
-try {
-    // Membuat koneksi menggunakan PDO agar seragam dengan file lainnya
-    $pdo = new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
-} catch (PDOException $e) {
-    // Jika gagal, tampilkan pesan error
-    die("Koneksi DB gagal: " . $e->getMessage());
+// Koneksi MySQLi
+$conn = new mysqli($host, $user, $pass, $db);
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
 }
 
-// Untuk mendukung skrip yang masih menggunakan variabel $conn
-$conn = new mysqli($host, $user, $pass, $db);
+// Jika PDO MySQL tersedia, siapkan objek PDO.
+// Jika tidak, fallback ke mysqli agar skrip CLI tetap berjalan.
+if (extension_loaded('pdo_mysql')) {
+    $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
+    try {
+        $pdo = new PDO($dsn, $user, $pass, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ]);
+    } catch (PDOException $e) {
+        die("Koneksi DB gagal: " . $e->getMessage());
+    }
+} else {
+    $pdo = $conn;
+}
 ?>
